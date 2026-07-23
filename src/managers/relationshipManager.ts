@@ -1,6 +1,7 @@
 import { analyzeRelationship } from "../ai-workers/relationshipWorker.js";
 import { type Request, type Response } from "express";
 import { InvalidQuestionError } from "../schemas/appErrors.js";
+import { RelationshipResult } from "../schemas/relationshipResult.js";
 
 interface AskRequest {
   question?: unknown;
@@ -21,11 +22,15 @@ export class RelationshipManager {
       throw new InvalidQuestionError();
     }
 
-    const relationship = await analyzeRelationship(cleanedQuestion);
+    const relationshipResult: RelationshipResult = await analyzeRelationship(cleanedQuestion);
 
     response.json({
       question: question.trim(),
-      answer: relationship
+      answer: relationshipResult.relationship,
+      explanation: relationshipResult.explanation,
+      evidence: relationshipResult.evidence,
+      confidence: relationshipResult.confidence,
+      answerFound: relationshipResult.answerFound
     });
   }
 }

@@ -3,7 +3,7 @@ import { type Request, type Response } from "express";
 import OpenAI from "openai";
 
 import { loadFamilyDocuments } from "../utilities/familyDocuments.js";
-import { relationshipResponseFormat, RelationshipResultSchema } from "../schemas/relationshipResult.js";
+import { relationshipResponseFormat, RelationshipResult } from "../schemas/relationshipResult.js";
 import { getRelationshipAssistantPrompt } from "../prompts/familyRelationshipAssistance.js";
 import { RelationshipAnalysisError, StructuredResultError } from "../schemas/appErrors.js";
 
@@ -16,7 +16,7 @@ if (!apiKey) {
 
 const openai = new OpenAI({ apiKey });
 
-export const analyzeRelationship = async (question: string): Promise<string> => {
+export const analyzeRelationship = async (question: string): Promise<RelationshipResult> => {
   try {
     const documentContext = await loadFamilyDocuments();
 
@@ -50,11 +50,7 @@ export const analyzeRelationship = async (question: string): Promise<string> => 
       throw new StructuredResultError();
     }
 
-    if (!parsedResult.answerFound) {
-      throw new RelationshipAnalysisError();
-    }
-
-    return parsedResult.relationship;
+    return parsedResult;
   } catch (error) {
     console.error(error);
     throw error;
