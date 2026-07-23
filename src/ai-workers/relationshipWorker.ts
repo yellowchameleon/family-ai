@@ -5,6 +5,7 @@ import OpenAI from "openai";
 import { loadFamilyDocuments } from "../utilities/familyDocuments.js";
 import { relationshipResponseFormat, RelationshipResultSchema } from "../schemas/relationshipResult.js";
 import { getRelationshipAssistantPrompt } from "../prompts/familyRelationshipAssistance.js";
+import { RelationshipAnalysisError, StructuredResultError } from "../schemas/appErrors.js";
 
 
 const apiKey = process.env.OPENAI_API_KEY;
@@ -15,60 +16,45 @@ if (!apiKey) {
 
 const openai = new OpenAI({ apiKey });
 
-
-interface AskRequest {
-  question?: unknown;
-}
-
-export const analyzeRelationship = async (request: Request<unknown, unknown, AskRequest>, response: Response) => {
+export const analyzeRelationship = async (question: string): Promise<string> => {
   try {
-    const question = request.body.question;
-
-    if (typeof question !== "string" || question.trim().length === 0) {
-      response.status(400).json({
-        error: "The request must contain a non-empty question."
-      });
-      return;
-    }
-
     const documentContext = await loadFamilyDocuments();
 
-    
+    const result = await openai.responses.parse({
+      model: process.env.OPENAI_MODEL ?? "gpt-5.6",
 
-      const result = await openai.responses.parse({
-        model: process.env.OPENAI_MODEL ?? "gpt-5.6",
-
-        input: 
-        [
-          {
-            role: "system",
-            content: getRelationshipAssistantPrompt()
-          },
-          {
-            role: "user",
-            content: `
-              FAMILY INFORMATION CONTEXT
-              ${documentContext}
-              QUESTION
-              ${question.trim()}
-            `
-          }
-        ],
-        text: {
-          format: relationshipResponseFormat
+      input: 
+      [
+        {
+          role: "system",
+          content: getRelationshipAssistantPrompt()
+        },
+        {
+          role: "user",
+          content: `
+            FAMILY INFORMATION CONTEXT
+            ${documentContext}
+            QUESTION
+            ${question.trim()}
+          `
         }
-      });
-
-      const parsedResult = result.output_parsed;
-
-      if (!parsedResult) {
-        throw new Error("The model did not return a structured result.");
+      ],
+      text: {
+        format: relationshipResponseFormat
       }
-
-    response.json({
-      question: question.trim(),
-      answer: parsedResult
     });
+
+    const parsedResult = result.output_parsed;
+
+    if (!parsedResult) {
+      throw new StructuredResultError();
+    }
+
+    if (!parsedResult.answerFound) {
+      throw new RelationshipAnalysisError();
+    }
+
+    return parsedResult.relationship;
   } catch (error) {
     console.error(error);
     throw error;

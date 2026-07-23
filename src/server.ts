@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express, {type NextFunction, type Request, type Response } from "express";
 import { analyzeRelationship } from "./ai-workers/relationshipWorker.js";
+import { AppError } from "./schemas/appErrors.js";
+import { RelationshipManager } from "./managers/relationshipManager.js";
 
 const apiKey = process.env.OPENAI_API_KEY;
 
@@ -16,10 +18,11 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.post("/ask", async (req, res, next) => {
+app.post("/analyzeRelationship", async (req, res, next) => {
+  const relationshipManager = new RelationshipManager();
+
   try {
-    await analyzeRelationship(req, res);
-    //res.json(result);
+    await relationshipManager.ask(req, res);
   } catch (error) {
     next(error);
   }
@@ -28,16 +31,16 @@ app.post("/ask", async (req, res, next) => {
 // Error-handling middleware must be last.
 // It requires four parameters.
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err);
+  if (err instanceof AppError) {
+    res.status(err.statusCode).json({ error: err.message });
+    return;
+  }
 
+  console.error(err);
   res.status(500).json({
     error: err instanceof Error ? err.message : String(err)
   });
 });
-
-// app.listen(3001, () => {
-//   console.log(`Family AI is running at http://localhost:${3001}`);
-// });
 
 const server = app.listen(3001, () => {
   console.log("Family AI is running at http://localhost:3001");
