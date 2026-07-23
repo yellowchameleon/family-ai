@@ -18,10 +18,6 @@ export class RelationshipManager {
 
     const cleanedQuestion = question.trim();
 
-    if (!cleanedQuestion) {
-      throw new InvalidQuestionError();
-    }
-
     const relationshipResult: RelationshipResult = await analyzeRelationship(cleanedQuestion);
 
     response.json({

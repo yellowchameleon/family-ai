@@ -1,14 +1,7 @@
 import "dotenv/config";
 import express, {type NextFunction, type Request, type Response } from "express";
-import { analyzeRelationship } from "./ai-workers/relationshipWorker.js";
 import { AppError } from "./schemas/appErrors.js";
 import { RelationshipManager } from "./managers/relationshipManager.js";
-
-const apiKey = process.env.OPENAI_API_KEY;
-
-if (!apiKey) {
-  throw new Error("OPENAI_API_KEY is missing from the .env file.");
-}
 
 const app = express();
 
