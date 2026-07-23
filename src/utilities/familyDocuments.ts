@@ -46,5 +46,6 @@ export async function loadFamilyDocuments(): Promise<string> {
           `DOCUMENT: ${document.filename}\n${document.content.trim()}`
       ).join("\n\n---\n\n");
   
+  console.log(`Document Context is: ${documentContext}`);
   return documentContext;
 }

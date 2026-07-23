@@ -18,8 +18,8 @@ app.get("/health", (_req, res) => {
 
 app.post("/ask", async (req, res, next) => {
   try {
-    const result = await analyzeRelationship(req, res);
-    res.json(result);
+    await analyzeRelationship(req, res);
+    //res.json(result);
   } catch (error) {
     next(error);
   }
@@ -35,6 +35,19 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log(`Family AI is running at http://localhost:${3000}`);
+// app.listen(3001, () => {
+//   console.log(`Family AI is running at http://localhost:${3001}`);
+// });
+
+const server = app.listen(3001, () => {
+  console.log("Family AI is running at http://localhost:3001");
+  console.log("Server listening:", server.address());
+});
+
+server.on("error", (error) => {
+  console.error("Server error:", error);
+});
+
+server.on("close", () => {
+  console.log("Server was closed.");
 });

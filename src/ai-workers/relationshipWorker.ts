@@ -1,9 +1,9 @@
 import "dotenv/config";
-import express, { type Request, type Response } from "express";
+import { type Request, type Response } from "express";
 import OpenAI from "openai";
-import { zodTextFormat } from "openai/helpers/zod";
+
 import { loadFamilyDocuments } from "../utilities/familyDocuments.js";
-import { RelationshipResultSchema } from "../schemas/relationshipResult.js";
+import { relationshipResponseFormat, RelationshipResultSchema } from "../schemas/relationshipResult.js";
 import { getRelationshipAssistantPrompt } from "../prompts/familyRelationshipAssistance.js";
 
 
@@ -47,7 +47,7 @@ export const analyzeRelationship = async (request: Request<unknown, unknown, Ask
           {
             role: "user",
             content: `
-              FAMILY DOCUMENTS
+              FAMILY INFORMATION CONTEXT
               ${documentContext}
               QUESTION
               ${question.trim()}
@@ -55,7 +55,7 @@ export const analyzeRelationship = async (request: Request<unknown, unknown, Ask
           }
         ],
         text: {
-          format: zodTextFormat(RelationshipResultSchema, "family-relationship")
+          format: relationshipResponseFormat
         }
       });
 
@@ -71,5 +71,6 @@ export const analyzeRelationship = async (request: Request<unknown, unknown, Ask
     });
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }

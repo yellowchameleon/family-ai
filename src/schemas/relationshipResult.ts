@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zodTextFormat } from "openai/helpers/zod";
 
 export const EvidenceSchema = z.object({
   fact: z.string(),
@@ -20,3 +21,9 @@ export const RelationshipResultSchema = z.object({
 export type RelationshipResult = z.infer<
   typeof RelationshipResultSchema
 >;
+
+export const relationshipResponseFormat =
+    zodTextFormat(
+        RelationshipResultSchema,
+        "relationship-result"
+    );
