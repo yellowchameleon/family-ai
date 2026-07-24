@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, {type NextFunction, type Request, type Response } from "express";
 import { AppError } from "./schemas/appErrors.js";
 import { RelationshipManager } from "./managers/relationshipManager.js";
+import { CheckSimilarityManager } from "./managers/checkSimilarityManager.js";
 
 const app = express();
 
@@ -20,6 +21,18 @@ app.post("/analyzeRelationship", async (req, res, next) => {
     next(error);
   }
 });
+
+app.post("/checkSimilarity", async (req, res, next) => {
+  const checkSimilarityManager = new (CheckSimilarityManager)();
+
+  try {
+    await checkSimilarityManager.ask(req, res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 // Error-handling middleware must be last.
 // It requires four parameters.

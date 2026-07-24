@@ -1,10 +1,11 @@
 import "dotenv/config";
 import OpenAI from "openai";
 
-import { FamilyDocument, loadFamilyDocuments } from "../utilities/familyDocuments.js";
+import { type FamilyDocument, loadFamilyDocuments } from "../utilities/familyDocuments.js";
 import { relationshipResponseFormat, RelationshipResult } from "../schemas/relationshipResult.js";
 import { getRelationshipAssistantPrompt } from "../prompts/familyRelationshipAssistance.js";
 import { StructuredResultError } from "../schemas/appErrors.js";
+import { getRelevantFamilyDocuments, type ScoredFamilyDocument } from "../retrievers/familyDocumentRetriever.js";
 
 
 const apiKey = process.env.OPENAI_API_KEY;
@@ -18,7 +19,14 @@ const openai = new OpenAI({ apiKey });
 export const analyzeRelationship = async (question: string): Promise<RelationshipResult> => {
   const familyDocuments: FamilyDocument[] = await loadFamilyDocuments();
 
-  const familyDocumentsContent = familyDocuments.map((document) =>
+  const relevantFamilyDocuments: ScoredFamilyDocument[]  = getRelevantFamilyDocuments( question, familyDocuments,5);
+  console.log("Retrieved documents:", relevantFamilyDocuments.map((relevantFamilyDocument) => ({filename: relevantFamilyDocument.document.filename, score: relevantFamilyDocument.score}))
+);
+
+
+  const familyDocumentsForAnalysis: FamilyDocument[] = relevantFamilyDocuments.length > 0 ? relevantFamilyDocuments.map((doc) => doc.document) : familyDocuments;
+
+  const familyDocumentsContent = familyDocumentsForAnalysis.map((document) =>
     `DOCUMENT: ${document.filename}\n${document.content.trim()}`
   ).join("\n\n---\n\n");
 

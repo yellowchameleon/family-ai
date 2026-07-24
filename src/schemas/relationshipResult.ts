@@ -22,8 +22,21 @@ export type RelationshipResult = z.infer<
   typeof RelationshipResultSchema
 >;
 
+export const SimilarityResultSchema = z.object({
+  firstString: z.string(),
+  secondString: z.string(),
+  similarityValue: z.float64()
+});
+
 export const relationshipResponseFormat =
     zodTextFormat(
         RelationshipResultSchema,
         "relationship-result"
+    );
+
+
+export const similarityResponseFormat =
+    zodTextFormat(
+        SimilarityResultSchema,
+        "similarity-result"
     );

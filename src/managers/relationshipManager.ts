@@ -1,7 +1,7 @@
 import { analyzeRelationship } from "../ai-workers/relationshipWorker.js";
 import { type Request, type Response } from "express";
 import { InvalidQuestionError } from "../schemas/appErrors.js";
-import { RelationshipResult } from "../schemas/relationshipResult.js";
+import type { RelationshipResult } from "../schemas/relationshipResult.js";
 
 interface AskRequest {
   question?: unknown;
