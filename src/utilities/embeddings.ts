@@ -19,23 +19,23 @@ const openai = new OpenAI({
  * @param {string} text 
  * @returns {Promise<number[]>} 
  */
-export async function createEmbedding(text: string): Promise<number[]> {
+export async function createEmbeddings(texts: string[]): Promise<number[][]> {
   const response = await openai.embeddings.create({
     model: "text-embedding-3-small",
-    input: text
+    input: texts
   });
 
-  const embedding = response.data[0]?.embedding;
+  const embeddings: number[][] = response.data.map((item) => item.embedding);
 
-  if (!embedding) {
-    throw new Error("OpenAI did not return an embedding.");
+  if (!embeddings || embeddings.length !== texts.length) {
+    throw new Error("OpenAI did not return the expected number of embeddings.");
   }
 
   console.log(
-    `Created embedding with ${embedding.length} numbers.`
+    `Created embedding with ${embeddings.length} numbers.`
   );
 
-  return embedding;
+  return embeddings;
 }
 
 /**
