@@ -22,6 +22,11 @@ export class RelationshipManager {
 
     response.json({
       question: question.trim(),
+      personOneName: relationshipResult.person1InputName,
+      personOneIdentifier: relationshipResult.person1IdentifiedAs,
+      personTwoName: relationshipResult.person2InputName,
+      personTwoIdentifier: relationshipResult.person2IdentifiedAs,
+      person2: relationshipResult.person2InputName  ,
       answer: relationshipResult.relationship,
       explanation: relationshipResult.explanation,
       evidence: relationshipResult.evidence,

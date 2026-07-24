@@ -19,6 +19,28 @@ const openai = new OpenAI({
  * @param {string} text 
  * @returns {Promise<number[]>} 
  */
+export async function createEmbedding(text: string): Promise<number[]> {
+  const embeddings = await createEmbeddings([text]);
+
+  const embedding = embeddings[0];
+
+  if (!embedding) {
+    throw new Error(
+      "OpenAI did not return an embedding."
+    );
+  }
+
+  return embedding;
+}
+
+
+/**
+ * 
+ * 
+ * @export
+ * @param {string} text 
+ * @returns {Promise<number[]>} 
+ */
 export async function createEmbeddings(texts: string[]): Promise<number[][]> {
   const response = await openai.embeddings.create({
     model: "text-embedding-3-small",
