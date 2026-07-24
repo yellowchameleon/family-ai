@@ -2,6 +2,7 @@ import { analyzeRelationship } from "../ai-workers/relationshipWorker.js";
 import { type Request, type Response } from "express";
 import { InvalidQuestionError } from "../schemas/appErrors.js";
 import type { RelationshipResult } from "../schemas/relationshipResult.js";
+import { FamilyDocument, loadFamilyDocuments } from "../utilities/familyDocuments.js";
 
 interface AskRequest {
   question?: unknown;
@@ -17,8 +18,8 @@ export class RelationshipManager {
     }
 
     const cleanedQuestion = question.trim();
-
-    const relationshipResult: RelationshipResult = await analyzeRelationship(cleanedQuestion);
+    const familyDocuments: FamilyDocument[] = await loadFamilyDocuments();
+    const relationshipResult: RelationshipResult = await analyzeRelationship(cleanedQuestion, familyDocuments);
 
     response.json({
       question: question.trim(),

@@ -17,15 +17,13 @@ if (!apiKey) {
 
 const openai = new OpenAI({ apiKey });
 
-export const analyzeRelationship = async (question: string): Promise<RelationshipResult> => {
-  const familyDocuments: FamilyDocument[] = await loadFamilyDocuments();
+export const analyzeRelationship = async (question: string, familyDocuments: FamilyDocument[]): Promise<RelationshipResult> => {
+  // const relevantFamilyDocuments: ScoredFamilyDocument[]  = getRelevantFamilyDocuments( question, familyDocuments,5);
+  // console.log("Retrieved documents:", relevantFamilyDocuments.map((relevantFamilyDocument) => ({filename: relevantFamilyDocument.document.filename, score: relevantFamilyDocument.score})));
+  // const familyDocumentsForAnalysis: FamilyDocument[] = relevantFamilyDocuments.length > 0 ? relevantFamilyDocuments.map((doc) => doc.document) : familyDocuments;
 
-  const relevantFamilyDocuments: ScoredFamilyDocument[]  = getRelevantFamilyDocuments( question, familyDocuments,5);
-  console.log("Retrieved documents:", relevantFamilyDocuments.map((relevantFamilyDocument) => ({filename: relevantFamilyDocument.document.filename, score: relevantFamilyDocument.score})));
-  const familyDocumentsForAnalysis: FamilyDocument[] = relevantFamilyDocuments.length > 0 ? relevantFamilyDocuments.map((doc) => doc.document) : familyDocuments;
-
-  const semanticResults = await getSemanticallyRelevantFamilyDocuments(question, 3);
-  const semanticDocumentsForAnalysis = semanticResults.map((result) => result.document);
+  const relevantFamilyDocuments = await getSemanticallyRelevantFamilyDocuments(question, 3);
+  const semanticDocumentsForAnalysis = relevantFamilyDocuments.map((result) => result.document);
 
 
 
