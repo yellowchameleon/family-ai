@@ -2,7 +2,9 @@ import { analyzeRelationship } from "../ai-workers/relationshipWorker.js";
 import { type Request, type Response } from "express";
 import { InvalidQuestionError } from "../schemas/appErrors.js";
 import type { RelationshipResult } from "../schemas/relationshipResult.js";
-import { FamilyDocument, loadFamilyDocuments } from "../utilities/familyDocuments.js";
+import { getSemanticallyRelevantFamilyDocuments } from "../retrievers/semanticFamilyDocumentRetriever.js";
+import type { SemanticFamilyDocument } from "../retrievers/semanticFamilyDocumentRetriever.js";
+import type { FamilyDocument } from "../utilities/familyDocuments.js";
 
 interface AskRequest {
   question?: unknown;
@@ -18,8 +20,13 @@ export class RelationshipManager {
     }
 
     const cleanedQuestion = question.trim();
-    const familyDocuments: FamilyDocument[] = await loadFamilyDocuments();
-    const relationshipResult: RelationshipResult = await analyzeRelationship(cleanedQuestion, familyDocuments);
+
+    const relevantFamilyDocuments: SemanticFamilyDocument[] = await getSemanticallyRelevantFamilyDocuments(cleanedQuestion, 3);
+    const familyDocumentsForAnalysis: FamilyDocument[] = relevantFamilyDocuments.map((result) => result.document);
+    console.log(`Number of Semantically relevant family documents: ${familyDocumentsForAnalysis.length}`);
+
+
+    const relationshipResult: RelationshipResult = await analyzeRelationship(cleanedQuestion, familyDocumentsForAnalysis);
 
     response.json({
       question: question.trim(),

@@ -14,8 +14,7 @@ export class CheckSimilarityManager {
   async ask(request: Request<unknown, unknown, AskRequest>, response: Response): Promise<void> {
     const firstValue = request.body.firstValue;
     const secondValue = request.body.secondValue; 
-
-
+    
     if (typeof firstValue !== "string" || firstValue.trim().length === 0) {
         throw new InvalidQuestionError();
     }

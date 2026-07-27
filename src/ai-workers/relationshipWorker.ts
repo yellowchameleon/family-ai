@@ -1,13 +1,10 @@
 import "dotenv/config";
 import OpenAI from "openai";
 
-import { type FamilyDocument, loadFamilyDocuments } from "../utilities/familyDocuments.js";
+import { type FamilyDocument } from "../utilities/familyDocuments.js";
 import { relationshipResponseFormat, RelationshipResult } from "../schemas/relationshipResult.js";
 import { getRelationshipAssistantPrompt } from "../prompts/familyRelationshipAssistance.js";
 import { StructuredResultError } from "../schemas/appErrors.js";
-import { getRelevantFamilyDocuments, type ScoredFamilyDocument } from "../retrievers/familyDocumentRetriever.js";
-import { getSemanticallyRelevantFamilyDocuments } from "../retrievers/semanticFamilyDocumentRetriever.js";
-
 
 const apiKey = process.env.OPENAI_API_KEY;
 
@@ -18,16 +15,7 @@ if (!apiKey) {
 const openai = new OpenAI({ apiKey });
 
 export const analyzeRelationship = async (question: string, familyDocuments: FamilyDocument[]): Promise<RelationshipResult> => {
-  // const relevantFamilyDocuments: ScoredFamilyDocument[]  = getRelevantFamilyDocuments( question, familyDocuments,5);
-  // console.log("Retrieved documents:", relevantFamilyDocuments.map((relevantFamilyDocument) => ({filename: relevantFamilyDocument.document.filename, score: relevantFamilyDocument.score})));
-  // const familyDocumentsForAnalysis: FamilyDocument[] = relevantFamilyDocuments.length > 0 ? relevantFamilyDocuments.map((doc) => doc.document) : familyDocuments;
-
-  const relevantFamilyDocuments = await getSemanticallyRelevantFamilyDocuments(question, 3);
-  const semanticDocumentsForAnalysis = relevantFamilyDocuments.map((result) => result.document);
-
-
-
-  const familyDocumentsContent = semanticDocumentsForAnalysis.map((document) =>
+  const familyDocumentsContent = familyDocuments.map((document) =>
     `DOCUMENT: ${document.filename}\n${document.content.trim()}`
   ).join("\n\n---\n\n");
 

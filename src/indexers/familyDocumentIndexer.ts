@@ -15,9 +15,7 @@ let embeddedFamilyDocuments: EmbeddedFamilyDocument[] = [];
  * @returns {Promise<void>} 
  */
 export async function initializeFamilyDocumentIndex():Promise<void> {
-  console.log(
-    "Initializing family document index..."
-  );
+  console.log("Initializing family document index...");
 
   const documents = await loadFamilyDocuments();
 

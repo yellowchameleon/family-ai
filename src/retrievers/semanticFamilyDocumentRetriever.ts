@@ -1,12 +1,12 @@
 import { getEmbeddedFamilyDocuments, type EmbeddedFamilyDocument } from "../indexers/familyDocumentIndexer.js";
 import { createEmbedding, calculateCosineSimilarity } from "../utilities/embeddings.js";
 
-export interface SemanticRetrievalResult {
+export interface SemanticFamilyDocument {
   document: EmbeddedFamilyDocument["document"];
   similarity: number;
 }
 
-export async function getSemanticallyRelevantFamilyDocuments( question: string, topK = 3 ): Promise<SemanticRetrievalResult[]> {
+export async function getSemanticallyRelevantFamilyDocuments( question: string, topK = 3 ): Promise<SemanticFamilyDocument[]> {
   console.log( "Starting semantic retrieval for question:", question );
 
   const questionEmbedding = await createEmbedding(question);
